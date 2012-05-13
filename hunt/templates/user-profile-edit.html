@@ -1,0 +1,780 @@
+{% extends "layout.html" %}
+
+{% block title %}完善用户资料{% endblock %}
+{% from "_forms.html" import render_errors %}
+
+{% block more_js %}
+<script type="text/javascript" src="/static/js/jquery.form.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+	function render_errors(errors) {
+	    for (var propt in errors){
+		var msg = '<sup class="form-error ym-required">'+errors[propt]+'</sup>';
+		var target = '#' + propt + ' label:first-child';
+		// alert(target);
+		// alert($(target).html());
+		$(msg).appendTo(target);
+	    }
+	}
+
+	function processReturn(json, msg_id, is_render){
+	    $('.form-error').remove();
+	    var selector = '#' + msg_id + '-msg';
+	    // alert(selector);
+	    var $msg = $(selector);
+	    if (json.success) {
+		$msg.removeClass('error').addClass('warning');
+		$msg.html('<span>' + json.message + '</span>').
+		    clearQueue().fadeIn(1000).delay(2000).fadeOut(800);
+	    } else {
+		$msg.removeClass('warning').addClass('error');
+		$msg.html('<span style="color:#800;">' + json.message + '</span>').
+		    clearQueue().fadeIn(1000).delay(2000).fadeOut(800);
+		if (is_render){
+		    delete json.success;
+		    delete json.message;
+		    render_errors(json);
+		}
+	    }
+	}
+
+	function processGeneral(json){ processReturn(json, 'general', true)}
+	function processEducation(json){ processReturn(json, 'education', true)}
+	function processItskill(json){ processReturn(json, 'itskill', false)}
+	// function processUpload(json){ processReturn(json, 'upload', true)}
+	
+	$('#general-form').ajaxForm({
+	    dataType : 'json',
+	    success : processGeneral
+	});
+	
+	$('#education-form').ajaxForm({
+	    dataType : 'json',
+	    success : processEducation
+	});
+
+	$('#itskill-form').ajaxForm({
+	    dataType : 'json',
+	    success : processItskill
+	});
+
+	// $('#upload-form').ajaxForm({
+	//     dataType : 'json',
+	//     success : processUpload
+	// });
+
+	/*  */
+	$('.sex-radio').change(function(){
+	    $('#sex').val($('.sex-radio:checked').val());
+	});
+
+	$('.sl-birthday').change(function(){
+	    var year = $('#sl-birthday-year').val();
+	    var month = $('#sl-birthday-month').val();
+	    var day = $('#sl-birthday-day').val();
+	    if (year && month && day){
+		$('#birthday').val(year + '-' + month + '-' + day);
+	    }
+	});
+	$('#sl-current-city').change(function(){
+	    var province = $('#sl-current-province').val();
+	    var city = $('#sl-current-city').val();
+	    if (province && city){
+		$('#current_address').val(province + ',' + city);
+	    }
+	});
+	
+	$('#sl-account-city').change(function(){
+	    var province = $('#sl-account-province').val();
+	    var city = $('#sl-account-city').val();
+	    if (province && city){
+		$('#account_address').val(province + ',' + city);
+	    }
+	});
+	
+	/* */
+	$('.sl-study-date').change(function(){
+	    var study_start_year = $('#sl-study-start-year').val();
+	    var study_start_month = $('#sl-study-start-month').val();
+	    var study_end_year = $('#sl-study-end-year').val();
+	    var study_end_month = $('#sl-study-end-month').val();
+	    if(study_start_year && study_start_month && study_end_year && study_end_month) {
+		$('#study_date').val(study_start_year + '-' + study_start_month + '-01'
+				     + ',' + study_end_year + '-' + study_end_month + '-01');
+	    }
+	});
+
+	$('.sl-speciality-type').change(function(){
+	    var speciality_type_l1 = $('#sl-speciality-type-l1').val();
+	    var speciality_type_l2 = $('#sl-speciality-type-l2').val();
+	    if (speciality_type_l1 && speciality_type_l2) {
+		$('#speciality_type').val(speciality_type_l1 + ',' + speciality_type_l2);
+	    }
+	});
+
+	/**/
+	$('.itskill-checkbox').change(function(){
+	    var skills = '';
+	    $('.itskill-checkbox').each(function(index){
+		if ($(this).attr('checked'))
+		    skills = skills + index + ',';
+	    });
+	    skills = skills.substring(0,skills.length-1);
+	    $('#it_skills').val(skills);
+	});
+	
+	/* Load the value */
+	/* General Info */
+	{% if user.sex != None %}
+	{% set sex = 1 if user.sex else 0 %}
+	$('.sex-radio').filter('input[value="{{sex}}"]').attr('checked', 'checked');
+	$('#sex').val('{{sex}}');
+	{% endif %}
+
+	{% if user.birthday != None %}
+	{% set year, month, day = user.birthday.strftime('%Y %m %d').split()%}
+	$('#sl-birthday-year').find('option[value="{{year}}"]').attr('selected', 'selected');
+	$('#sl-birthday-month').find('option[value="{{month}}"]').attr('selected', 'selected');
+	$('#sl-birthday-day').find('option[value="{{day}}"]').attr('selected', 'selected');
+	$('#birthday').val('{{user.birthday.strftime("%Y-%m-%d")}}');
+	{% endif %}
+
+	{% if user.current_address != None %}
+	{% set province, city = user.current_address.split(',')%}
+	$('#sl-current-province').find('option[value="{{province}}"]').attr('selected', 'selected');
+	$('#sl-current-city').find('option[value="{{city}}"]').attr('selected', 'selected');
+        $('#current_address').val('{{user.current_address}}');
+	{% endif %}
+
+	{% if user.account_address != None %}
+	{% set province, city = user.account_address.split(',')%}
+	$('#sl-account-province').find('option[value="{{province}}"]').attr('selected', 'selected');
+	$('#sl-account-city').find('option[value="{{city}}"]').attr('selected', 'selected');
+	$('#account_address').val('{{user.account_address}}');
+	{% endif %}
+
+	/* Education */
+	{% if user.degree != None %}
+	$('#sl-degree').find('option[value="{{user.degree}}"]').attr('selected', 'selected');
+	{% endif %}
+
+
+	{% if user.study_start != None %}
+	{% set year, month = user.study_start.strftime('%Y %m').split() %}
+	$('#sl-study-start-year').find('option[value="{{year}}"]').attr('selected', 'selected');
+	$('#sl-study-start-month').find('option[value="{{month}}"]').attr('selected', 'selected');
+	{% endif %}
+
+	{% if user.study_end != None %}
+	{% set year, month = user.study_end.strftime('%Y %m').split() %}
+	$('#sl-study-end-year').find('option[value="{{year}}"]').attr('selected', 'selected');
+	$('#sl-study-end-month').find('option[value="{{month}}"]').attr('selected', 'selected');
+	$('#study_date').val('{{user.study_start.strftime("%Y-%m-%d")}},{{user.study_end.strftime("%Y-%m-%d")}}');
+	{% endif %}
+
+	{% if user.speciality_type != None %}
+	{% set type_l1, type_l2 = user.speciality_type.split(',') %}
+	$('#sl-speciality-type-l1').find('option[value="{{type_l1}}"]').attr('selected', 'selected');
+	$('#sl-speciality-type-l2').find('option[value="{{type_l2}}"]').attr('selected', 'selected');
+	$('#speciality_type').val('{{user.speciality_type}}');
+	{% endif %}
+
+	/* IT skills */
+	{% if user.it_skills != None %}
+	var indexs = new Array({{ user.it_skills }});
+	var $checkboxes = $('.itskill-checkbox');
+	for (var i in indexs){
+	    $($checkboxes.get(indexs[i])).attr('checked', 'checked');
+	}
+	$('#it_skills').val('{{user.it_skills}}');
+	{% endif %}
+    });    
+</script>
+{% endblock %}
+
+{% block wbox %}
+<div class="ym-wbox">
+    <section>
+	<div class="ym-grid linearize-level-1">
+	    <div class="ym-g75 ym-gl">
+		<!-- 基本信息 -->
+		<div class="ym-gbox">
+		    <div id="general-msg" class="box warning message" style="text-align:center;display:none;">
+		    </div>
+
+		    <div class="box info">
+			<h4>基本信息</h4>
+			<form method="POST" id="general-form" class="ym-form linearize-form ym-columnar"
+			      action="{{ url_for('account.update_general_info') }}">
+			    {{ gi_form.hidden_tag() }}
+			    <p>
+				<div class="ym-fbox-text" id="realname">
+				    <label for="input-realname">姓名
+					<sup class="ym-required">*</sup></label>
+				    <input type="text" name="realname" id="input-realname" value="{{user.realname or ''}}" />
+				</div>
+				<div class="ym-fbox-text" id="sex">
+				    <label>性别
+					<sup class="ym-required">*</sup></label>
+				    <label for="sex-m" style="width:50px;">
+					<input type="radio" name="sex_radio" value="1"
+					       id="sex-m" class="sex-radio" style="width:25px;margin-top:2px;"/>男
+				    </label>
+				    <label for="sex-f" style="width:50px;">
+					<input type="radio" name="sex_radio" value="0"
+					       id="sex-f" class="sex-radio" style="width:25px;margin-top:2px;"/>女
+				    </label>
+				</div>
+				<div class="ym-fbox-select" id="birthday">
+				    <label for="sl-birthday-year">
+					出生日期<sup class="ym-required">*</sup></label>
+				    <select name="sl_birthday_year" class="sl-birthday" id="sl-birthday-year" style="width:auto;">
+					<option value="" selectd="selected"></option>
+					<option value="1959">1959</option>
+					<option value="1960">1960</option>
+					<option value="1961">1961</option>
+					<option value="1962">1962</option>
+					<option value="1963">1963</option>
+					<option value="1964">1964</option>
+					<option value="1965">1965</option>
+					<option value="1966">1966</option>
+					<option value="1967">1967</option>
+					<option value="1968">1968</option>
+					<option value="1969">1969</option>
+					<option value="1970">1970</option>
+					<option value="1971">1971</option>
+					<option value="1972">1972</option>
+					<option value="1973">1973</option>
+					<option value="1974">1974</option>
+					<option value="1975">1975</option>
+					<option value="1976">1976</option>
+					<option value="1977">1977</option>
+					<option value="1978">1978</option>
+					<option value="1979">1979</option>
+					<option value="1980">1980</option>
+					<option value="1981">1981</option>
+					<option value="1982">1982</option>
+					<option value="1983">1983</option>
+					<option value="1984">1984</option>
+					<option value="1985">1985</option>
+					<option value="1986">1986</option>
+					<option value="1987">1987</option>
+					<option value="1988">1988</option>
+					<option value="1989">1989</option>
+					<option value="1990">1990</option>
+					<option value="1991">1991</option>
+					<option value="1992">1992</option>
+					<option value="1993">1993</option>
+					<option value="1994">1994</option>
+					<option value="1995">1995</option>
+					<option value="1996">1996</option>
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">年</label>
+
+				    <select name="sl_birthday_month" class="sl-birthday" id="sl-birthday-month" size="1" style="width:auto;">
+					<option value="" selectd="selected"></option>
+					<option value="01">1</option>
+					<option value="02">2</option>
+					<option value="03">3</option>
+					<option value="04">4</option>
+					<option value="05">5</option>
+					<option value="06">6</option>
+					<option value="07">7</option>
+					<option value="08">8</option>
+					<option value="09">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">月</label>
+
+				    <select name="sl_birthday_day" class="sl-birthday" id="sl-birthday-day" size="1" style="width:auto;">
+					<option value="" selected="selected"></option>
+					<option value="01">1</option>
+					<option value="02">2</option>
+					<option value="03">3</option>
+					<option value="04">4</option>
+					<option value="05">5</option>
+					<option value="06">6</option>
+					<option value="07">7</option>
+					<option value="08">8</option>
+					<option value="09">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+					<option value="13">13</option>
+					<option value="14">14</option>
+					<option value="15">15</option>
+					<option value="16">16</option>
+					<option value="17">17</option>
+					<option value="18">18</option>
+					<option value="19">19</option>
+					<option value="20">20</option>
+					<option value="21">21</option>
+					<option value="22">22</option>
+					<option value="23">23</option>
+					<option value="24">24</option>
+					<option value="25">25</option>
+					<option value="26">26</option>
+					<option value="27">27</option>
+					<option value="28">28</option>
+					<option value="29">29</option>
+					<option value="30">30</option>
+					<option value="31">31</option>
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">日</label>
+				</div>
+
+				<div class="ym-fbox-select" id="current_address">
+				    <label for="sl-current-province">当前所在地
+					<sup class="ym-required">*</sup></label>
+				    <select name="sl_current_province" id="sl-current-province" size="1" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="北京">北京</option>
+					<option value="天津">天津</option>
+					<option value="河北">河北</option>
+					<option value="山西">山西</option>
+					<option value="内蒙古">内蒙古</option>
+					<option value="辽宁">辽宁</option>
+					<option value="吉林">吉林</option>
+					<option value="黑龙江">黑龙江</option>
+					<option value="上海">上海</option>
+					<option value="江苏">江苏</option>
+					<option value="浙江">浙江</option>
+					<option value="安徽">安徽</option>
+					<option value="福建">福建</option>
+					<option value="江西">江西</option>
+					<option value="山东">山东</option>
+					<option value="河南">河南</option>
+					<option value="湖北">湖北</option>
+					<option value="湖南">湖南</option>
+					<option value="广东">广东</option>
+					<option value="广西">广西</option>
+					<option value="海南">海南</option>
+					<option value="重庆">重庆</option>
+					<option value="四川">四川</option>
+					<option value="贵州">贵州</option>
+					<option value="云南">云南</option>
+					<option value="西藏">西藏</option>
+					<option value="陕西">陕西</option>
+					<option value="甘肃">甘肃</option>
+					<option value="青海">青海</option>
+					<option value="宁夏">宁夏</option>
+					<option value="新疆">新疆</option>
+					<option value="港澳台">港澳台</option>
+					<option value="海外">海外</option>
+				    </select>
+				    <label style="width:20px;">&nbsp;</label>
+
+				    <select name="sl_current_city" id="sl-current-city" size="1" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="杭州">杭州</option>
+					<option value="宁波">宁波</option>
+					<option value="温州">温州</option>
+					<option value="嘉兴">嘉兴</option>
+					<option value="湖州">湖州</option>
+					<option value="绍兴">绍兴</option>
+					<option value="金华">金华</option>
+					<option value="衢州">衢州</option>
+					<option value="舟山">舟山</option>
+					<option value="台州">台州</option>
+					<option value="丽水">丽水</option>
+					<option value="慈溪">慈溪</option>
+					<option value="萧山">萧山</option>
+					<option value="海宁">海宁</option>
+					<option value="义乌">义乌</option>
+					<option value="余姚">余姚</option>
+				    </select>
+				</div>
+
+				<div class="ym-fbox-select" id="account_address">
+				    <label for="sl-account-province">户口所在地
+					<sup class="ym-required">*</sup></label>
+				    <select name="sl_account_province" id="sl-account-province" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="北京">北京</option>
+					<option value="天津">天津</option>
+					<option value="河北">河北</option>
+					<option value="山西">山西</option>
+					<option value="内蒙古">内蒙古</option>
+					<option value="辽宁">辽宁</option>
+					<option value="吉林">吉林</option>
+					<option value="黑龙江">黑龙江</option>
+					<option value="上海">上海</option>
+					<option value="江苏">江苏</option>
+					<option value="浙江">浙江</option>
+					<option value="安徽">安徽</option>
+					<option value="福建">福建</option>
+					<option value="江西">江西</option>
+					<option value="山东">山东</option>
+					<option value="河南">河南</option>
+					<option value="湖北">湖北</option>
+					<option value="湖南">湖南</option>
+					<option value="广东">广东</option>
+					<option value="广西">广西</option>
+					<option value="海南">海南</option>
+					<option value="重庆">重庆</option>
+					<option value="四川">四川</option>
+					<option value="贵州">贵州</option>
+					<option value="云南">云南</option>
+					<option value="西藏">西藏</option>
+					<option value="陕西">陕西</option>
+					<option value="甘肃">甘肃</option>
+					<option value="青海">青海</option>
+					<option value="宁夏">宁夏</option>
+					<option value="新疆">新疆</option>
+					<option value="港澳台">港澳台</option>
+					<option value="海外">海外</option>
+				    </select>
+				    <label style="width:20px;">&nbsp;</label>
+
+				    <select name="sl_account_city" id="sl-account-city" size="1" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="杭州">杭州</option>
+					<option value="宁波">宁波</option>
+					<option value="温州">温州</option>
+					<option value="嘉兴">嘉兴</option>
+					<option value="湖州">湖州</option>
+					<option value="绍兴">绍兴</option>
+					<option value="金华">金华</option>
+					<option value="衢州">衢州</option>
+					<option value="舟山">舟山</option>
+					<option value="台州">台州</option>
+					<option value="丽水">丽水</option>
+					<option value="慈溪">慈溪</option>
+					<option value="萧山">萧山</option>
+					<option value="海宁">海宁</option>
+					<option value="义乌">义乌</option>
+					<option value="余姚">余姚</option>
+				    </select>
+				</div>
+				<div class="ym-fbox-text" id="phone_num">
+				    <label for="input-phone-num">手机
+					<sup class="ym-required">*</sup></label>
+				    <input type="text" name="phone_num" id="input-phone-num" value="{{user.phone_num or ''}}" />
+				</div>
+			    </p>
+			    <div class="ym-fbox-button">
+				<input type="submit" value="保存" class="save ym-gr" id="submit" name="submit">
+			    </div>
+			</form>
+		    </div>
+		</div>
+		
+		<!-- 教育经历 -->
+		<div class="ym-gbox">
+		    <div id="education-msg" class="box warning message" style="text-align:center;display:none;">
+		    </div>
+		    <div class="box info">
+			<h4>教育经历</h4>
+			<form method="POST" id="education-form" class="ym-form linearize-form ym-columnar" action="{{url_for('account.update_education_info')}}">
+			    {{ edu_form.hidden_tag()}}
+			    <p>
+				<div class="ym-fbox-select" id="degree">
+				    <label for="sl-degree">学历<sup class="ym-required">*</sup></label>
+				    <select name="degree" id="sl-degree" size="1" style="width:auto;">
+					<option value="" selected="selected" disabled="disabled"></option>
+					<option value="博士后">博士后</option>
+					<option value="博士">博士</option>
+					<option value="硕士">硕士</option>
+					<option value="本科">本科</option>
+					<option value="大专">大专</option>
+					<option value="其他">其他</option>
+				    </select>
+				</div>
+				<div class="ym-fbox-select" id="study_date">
+				    <label for="sl-study-start">就读时间<sup class="ym-required">*</sup></label>
+				    <select name="study_start_year" id="sl-study-start-year" class="sl-study-date" size="1" style="width:auto;">
+					<option value=""></option>
+					<option value="2002">2002</option>
+					<option value="2003">2003</option>
+					<option value="2004">2004</option>
+					<option value="2005">2005</option>
+					<option value="2006">2006</option>
+					<option value="2007">2007</option>
+					<option value="2008">2008</option>
+					<option value="2009">2009</option>
+					<option value="2010">2010</option>
+					<option value="2011">2011</option>
+					<option value="2012">2012</option>
+					
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">年</label>
+				    <select name="study_start_year" id="sl-study-start-month" class="sl-study-date" size="1" style="width:auto;">
+					<option value=""></option>
+					<option value="01">1</option>
+					<option value="02">2</option>
+					<option value="03">3</option>
+					<option value="04">4</option>
+					<option value="05">5</option>
+					<option value="06">6</option>
+					<option value="07">7</option>
+					<option value="08">8</option>
+					<option value="09">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">月</label>
+				    <label style="width:36px;padding:3px 18px 3px 5px;">至</label>
+				    <select name="study_end_year" id="sl-study-end-year" class="sl-study-date" size="1" style="width:auto;">
+					<option value=""></option>
+					<option value="2002">2002</option>
+					<option value="2003">2003</option>
+					<option value="2004">2004</option>
+					<option value="2005">2005</option>
+					<option value="2006">2006</option>
+					<option value="2007">2007</option>
+					<option value="2008">2008</option>
+					<option value="2009">2009</option>
+					<option value="2010">2010</option>
+					<option value="2011">2011</option>
+					<option value="2012">2012</option>
+					
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">年</label>
+				    <select name="study_end_month" id="sl-study-end-month" class="sl-study-date" size="1" style="width:auto;">
+					<option value=""></option>
+					<option value="01">1</option>
+					<option value="02">2</option>
+					<option value="03">3</option>
+					<option value="04">4</option>
+					<option value="05">5</option>
+					<option value="06">6</option>
+					<option value="07">7</option>
+					<option value="08">8</option>
+					<option value="09">9</option>
+					<option value="10">10</option>
+					<option value="11">11</option>
+					<option value="12">12</option>
+				    </select>
+				    <label style="width:36px;padding:3px 10px;">月</label>
+				</div>
+				<div class="ym-fbox-text" id="school">
+				    <label for="input-school">学校名称<sup class="ym-required">*</sup></label>
+				    <input type="text" name="school" id="input-school" value="{{user.school or ''}}" />
+				</div>
+				<div class="ym-fbox-select" id="speciality_type">
+				    <label for="sl-speciality-type-l1">专业类别<sup class="ym-required">*</sup></label>
+				    <select name="speciality_type_l1" id="sl-speciality-type-l1" class="sl-speciality-type" size="1" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="哲学">哲学</option>
+					<option value="经济学">经济学</option>
+					<option value="法学">法学</option>
+					<option value="教育学">教育学</option>
+					<option value="文学">文学</option>
+					<option value="历史学">历史学</option>
+					<option value="理学">理学</option>
+					<option value="工学">工学</option>
+					<option value="农学">农学</option>
+					<option value="医学">医学</option>
+					<option value="管理学">管理学</option>
+				    </select>
+				    <label style="width:20px;">&nbsp;</label>
+				    <select name="speciality_type_l2" id="sl-speciality-type-l2" class="sl-speciality-type" size="1" style="width:auto;">
+					<option value="">请选择</option>
+					<option value="哲学">哲学</option>
+					<option value="经济学">经济学</option>
+					<option value="法学">法学</option>
+					<option value="教育学">教育学</option>
+					<option value="文学">文学</option>
+					<option value="历史学">历史学</option>
+					<option value="理学">理学</option>
+					<option value="工学">工学</option>
+					<option value="农学">农学</option>
+					<option value="医学">医学</option>
+					<option value="管理学">管理学</option>
+				    </select>
+				</div>
+				<div class="ym-fbox-text" id="speciality">
+				    <label for="input-speciality">专业名称</label>
+				    <input type="text" name="speciality" id="input-speciality" value="{{user.speciality or ''}}" />
+				</div>
+			    </p>
+			    <div class="ym-fbox-button">
+				<input type="submit" value="保存" class="save ym-gr" id="submit" name="submit">
+			    </div>
+			</form>
+		    </div>
+		</div>
+		
+		<!-- IT 技能 -->
+		<div class="ym-gbox">
+		    <div id="itskill-msg" class="box warning message" style="text-align:center;display:none;">
+		    </div>
+		    <div class="box info">
+			<h4>IT 技能</h4>
+			<form method="POST" id="itskill-form" class="ym-form linearize-form " action="{{url_for('account.update_itskill_info')}}">
+			    {{ itskill_form.hidden_tag() }}
+			    <p>
+				<div class="ym-fbox-check">
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-word" />
+					<label for="skill-word">Word</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-excel" />
+					<label for="skill-excel">Excel</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-powerpoint" />
+					<label for="skill-powerpoint">PowerPoint</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-csharp" />
+					<label for="skill-csharp">C#</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-c" />
+					<label for="skill-c">C</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-cpp" />
+					<label for="skill-cpp">C++</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-java" />
+					<label for="skill-java">Java</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-jsp" />
+					<label for="skill-jsp">JSP</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-php" />
+					<label for="skill-php">PHP</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-vb" />
+					<label for="skill-vb">VB</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-vcpp" />
+					<label for="skill-vcpp">VC++</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-sqlserver" />
+					<label for="skill-sqlserver">SQLServer</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-access" />
+					<label for="skill-access">Access</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-mysql" />
+					<label for="skill-mysql">MySQL</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-oracle" />
+					<label for="skill-oracle">Oracle</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-spss" />
+					<label for="skill-spss">SPSS</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-html" />
+					<label for="skill-html">HTML</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-js" />
+					<label for="skill-js">JavaScript</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-linux" />
+					<label for="skill-linux">Linux</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-windows" />
+					<label for="skill-windows">WINDOWS</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-3dmax" />
+					<label for="skill-3dmax">3DMAX</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-flash" />
+					<label for="skill-flash">Flash</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-premiere" />
+					<label for="skill-premiere">Premiere</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-ps" />
+					<label for="skill-ps">Photoshop</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-coreldraw" />
+					<label for="skill-coreldraw">CorelDraw</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-illustrator" />
+					<label for="skill-illustrator">Illustrator</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-autocad" />
+					<label for="skill-autocad">AutoCAD</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-proe" />
+					<label for="skill-proe">Pro/E</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-protel" />
+					<label for="skill-protel">Protel</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-python" />
+					<label for="skill-python">Python</label>
+				    </div>
+				    <div style="width:110px;float:left;">
+					<input type="checkbox" name="it_skill" class="itskill-checkbox" id="skill-emacs" />
+					<label for="skill-emacs">Emacs</label>
+				    </div>
+				</div>
+			    </p>
+			    <div class="ym-fbox-button">
+				<input type="submit" value="保存" class="save ym-gr" id="submit" name="submit">
+			    </div>
+			</form>
+		    </div>
+		</div>
+		<!-- <div class="ym-gbox"> -->
+		<!--     <div id="upload-msg" class="box warning message" style="text-align:center;display:none;"> -->
+		<!--     </div> -->
+
+		<!--     <div class="box info"> -->
+		<!-- 	<h4>文件上传</h4> -->
+		<!-- 	<form method="POST" id="" class="ym-form linearize-form ym-columnar" action="" enctype="multipart/form-data"> -->
+		<!-- 	    <p> -->
+		<!-- 		<div class="ym-fbox-text"> -->
+		<!-- 		    <label>头像</label> -->
+		<!-- 		    <input type="file" name="filedata" mutliple="multiple" /> -->
+		<!-- 		</div> -->
+		<!-- 	    </p> -->
+		<!-- 	    <div class="ym-fbox-button"> -->
+		<!-- 		<input type="submit" value="保存" class="save ym-gr" id="submit" name="submit"> -->
+		<!-- 	    </div> -->
+		<!-- 	</form> -->
+		<!-- 	<form method="POST" id="upload-form" class="ym-form linearize-form ym-columnar" action="" enctype="multipart/form-data"> -->
+		<!-- 	    <p> -->
+		<!-- 		<div class="ym-fbox-text"> -->
+		<!-- 		    <label>简历文档</label> -->
+		<!-- 		    <input type="file" name="filedata" mutliple="multiple" /> -->
+		<!-- 		</div> -->
+		<!-- 	    </p> -->
+		<!-- 	    <div class="ym-fbox-button"> -->
+		<!-- 		<input type="submit" value="保存" class="save ym-gr" id="submit" name="submit"> -->
+		<!-- 	    </div> -->
+		<!-- 	</form> -->
+		<!--     </div> -->
+		<!-- </div> -->
+	    </div>
+	    <div class="ym-g25 ym-gr">
+		<div class="ym-gbox-right">&nbsp;</div>
+	    </div>
+	</div>
+    </section>
+</div>
+{% endblock %}

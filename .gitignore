@@ -1,5 +1,13 @@
 *.py[co]
 
+# Custom
+*~
+*.rar
+*.swp
+/HTML-pages
+/hunt/static_old
+/hunt/template_old
+
 # Packages
 *.egg
 *.egg-info

@@ -1,0 +1,147 @@
+{% extends "layout.html" %}
+
+{% block title %}职位详情{% endblock %}
+
+{% block wbox %}
+{% set company = job.company %}
+<div class="ym-wbox">
+    <section class="ym-grid linearize-level-1">
+	<article class="ym-g66 ym-gl content">
+	    <div class="ym-gbox-left ym-clearfix">
+		<h4>高级PHP研发工程师</h4>
+		<div class="jquery_tabs" data-sync="true">
+		    <h5>职位描述/要求</h5>
+		    <div class="tab-content">
+			<div class="box">
+			    {{ job.description|safe }}
+			</div>
+		    </div>
+		    <h5>公司详情</h5>
+		    <div class="tab-content">
+			<div class="box">
+			    <h6>
+				{% if company.website %}<a href="{{company.website}}" title="公司官方网址">{% endif %}
+				    {{ company.name }}
+				    {% if company.website %}</a>{% endif %}
+			    </h6>
+			    <table class="" style="font-size:0.9em;">
+				<tbody>
+				    {% if company.type %}
+				    <tr>
+					<th width="15%">公司类型</th>
+					<td width="85%">{{ company.type }}</td>
+				    </tr>
+				    {% endif %}
+				    
+				    {% if company.scale_low %}
+				    <tr>
+					<th>公司规模</th>
+					<td>{{ company.scale_low }} - {{company.scale_high}} 人</td>
+				    </tr>
+				    {% endif %}
+
+				    {% if company.industry %}
+				    <tr>
+					<th>公司行业</th>
+					<td>{{ company.industry }}</td>
+				    </tr>
+				    {% endif %}
+				</tbody>
+			    </table>
+			</div>
+			<div class="box">
+			    {{ company.description|safe }}
+			</div>
+		    </div>
+		</div>
+	    </div>
+	</article>
+	<aside class="ym-g33 ym-gr ">
+	    <div class="ym-gbox-right ym-clearfix">
+		<div class="box info">
+		    <h3>职位信息</h3>
+		    <table class="">
+			<tbody>
+			    {% if job.occupational.type %}
+			    <tr>
+				<th width="33%">职位类别</th>
+				<td width="67%">{{ job.occupational.type }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.work_city %}
+			    <tr>
+				<th>工作地点</th>
+				<td>{{ job.work_city }}{% if job.work_area %} - {{ job.work_area }}{% endif %} </td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.public_date %}
+			    <tr>
+				<th>发布日期</th>
+				<td>{{ job.public_date.strftime('%Y-%m-%d') }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.exp %}
+			    <tr>
+				<th>工作经验</th>
+				<td>{{ job.exp }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.manage_exp %}
+			    <tr>
+				<th>管理经验</th>
+				<td>{{ job.manage_exp }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.quantity %}
+			    <tr>
+				<th>招聘人数</th>
+				<td>{{ job.quantity }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.degree %}
+			    <tr>
+				<th>最低学历</th>
+				<td>{{ job.degree }}</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.salary_low %}
+			    <tr>
+				<th>薪水范围</th>
+				<td>{{ job.salary_low }} - {{ job.salary_high }} 元/月</td>
+			    </tr>
+			    {% endif %}
+
+			    {% if job.type %}
+			    <tr>
+				<th>工作性质</th>
+				<td>{{ job.type }}</td>
+			    </tr>
+			    {% endif %}
+			</tbody>
+		    </table>
+		</div>
+		
+		<p>
+		</p>
+	    </div>
+	</aside>
+    </section>
+</div>
+{% endblock %}
+
+
+
+{% block more_js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+	$('.jquery_tabs').accessibleTabs({ syncheight: false, wrapperClass:'' });
+    });
+</script>
+{% endblock %}

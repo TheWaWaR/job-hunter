@@ -1,0 +1,196 @@
+{% extends "layout.html" %}
+
+{% block title %}职位搜索{% endblock %}
+
+{% block more_js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+	// alert('{{exp}}');
+	// alert('{{salary}}');
+	// alert('{{public_date}}');
+
+	{% if exp %}
+	$('#exp').find('option[value="{{exp}}"]').attr('selected', 'selected');
+	{% endif %}
+
+	{% if salary %}
+	$('#salary').find('option[value="{{salary}}"]').attr('selected', 'selected');
+	{% endif %}
+
+	{% if public_date %}
+	$('#public-date').find('option[value="{{public_date}}"]').attr('selected', 'selected');
+	{% endif %}
+
+	$('.do-request').each(function(index){
+	    var $tar = $(this);
+	    $tar.click(function(e){
+		e.preventDefault();
+		$.getJSON($tar.attr('url'), function(json){
+		    if (json.success) {
+			if (json.from == 'add') {
+			    $tar.text('取消');
+			    $tar.css('font-weight', 'normal');
+			} else {
+			    $tar.text('申请');
+			    $tar.css('font-weight', 'bold');
+			}
+			$tar.attr('url', json.url);
+		    } else {
+			alert(json.message);
+		    }
+		});
+	    });
+	});
+    });
+</script>
+{% endblock %}
+
+{% from "_page.html" import pagination %}
+{% block wbox %}
+<div class="ym-wbox">
+    <!-- 搜索框 -->
+    <section class="ym-grid linearize-level-1">
+	<div class="box info">
+	    
+	<form method="get" action="{{url_for('job.search')}}" id="demo-form2" class="ym-form linearize-form ym-full" role="application">
+	    <div class="ym-grid linearize-level-1">
+		<div class="ym-g80 ym-gl">
+		    <div class="ym-grid linearize-level-2">
+			<div class="ym-g33 ym-gl">
+			    <div class="ym-gbox ym-fbox-select">
+				<label for="exp">工作经验</label>
+				<select name="exp" id="exp" size="1" style="width:auto;">
+				    <!-- <option value="0" selected="selected" disabled="disabled">请选择</option> -->
+				    <option value="不限">不限</option>
+				    <option value="无经验">无经验</option>
+				    <option value="1年以下">1年以下</option>
+				    <option value="1-2年">1-2年</option>
+				    <option value="1-3年">1-3年</option>
+				    <option value="1-5年">1-5年</option>
+				    <option value="1-6年">1-6年</option>
+				    <option value="1-8年">1-8年</option>
+				    <option value="1-10年">1-10年</option>
+				    <option value="3-5年">3-5年</option>
+				    <option value="2-3年">2-3年</option>
+				    <option value="2-4年">2-4年</option>
+				    <option value="2-5年">2-5年</option>
+				    <option value="2-7年">2-7年</option>
+				    <option value="2-10年">2-10年</option>
+				    <option value="3-10年">3-10年</option>
+				    <option value="5-10年">5-10年</option>
+				    <option value="1年以上">1年以上</option>
+				    <option value="2年以上">2年以上</option>
+				    <option value="3年以上">3年以上</option>
+				    <option value="4年以上">4年以上</option>
+				    <option value="5年以上">5年以上</option>
+				    <option value="7年以上">7年以上</option>
+				    <option value="8年以上">8年以上</option>
+				    <option value="10年以上">10年以上</option>
+				</select>
+			    </div>
+			    <div class="ym-gbox ym-fbox-select">
+				<label for="salary">薪资水平</label>
+				<select name="salary" id="salary" style="width:auto;">
+				    <option value="0">不限</option>
+				    <option value="1000">1000+</option>
+				    <option value="1500">1500+</option>
+				    <option value="2000">2000+</option>
+				    <option value="3000">3000+</option>
+				    <option value="4000">4000+</option>
+				    <option value="5000">5000+</option>
+				    <option value="6000">6000+</option>
+				    <option value="8000">8000+</option>
+				    <option value="10000">10000+</option>
+				    <option value="15000">15000+</option>
+				</select>
+			    </div>
+			</div>
+			<div class="ym-g33 ym-gl">
+			    <div class="ym-gbox ym-fbox-select">
+				<label for="public-date">发布日期</label>
+				<select name="public_date" id="public-date" style="width:auto;" >
+				    <option value="all" selected="selected">所有日期</option>
+				    <option value="month">最近一个月</option>
+				    <option value="week">最近一周</option>
+				    <option value="3days">最近3天</option>
+				    <option value="today">今天</option>
+				</select>
+				<!-- <label style="width:10px;float:left;">&nbsp;</label> -->
+			    </div>
+			    <div class="ym-gbox ym-fbox-text">
+				<label for="key-word">关键词</label>
+				<input type="text" name="key_words" value="{{ key_words }}"
+				       id="key-word" size="20" placeholder="与招聘内容相关">
+			    </div>
+			</div>
+			<div class="ym-g33 ym-gl">
+			    <div class="ym-gbox ym-fbox-text">
+				<label for="company-name">公司名称</label>
+				<input type="text" name="company_name" value="{{ company_name }}" id="company-name" size="20">
+			    </div>
+			    <div class="ym-gbox ym-fbox-text">
+				<label for="work-place">工作地点</label>
+				<input type="text" name="work_place" value="{{ work_place }}"
+				       id="work-place" size="20" placeholder="例如(浙江 杭州)">
+			    </div>
+			</div>
+		    </div>
+		</div>
+		
+		<div class="ym-g20 ym-gr">
+		    <div class="ym-fbox-button">
+			<input type="submit" value="搜索" class="submit" id="submit1">
+			<input type="reset" value="重置" class="reset" id="reset1" name="reset1">
+		    </div>
+		</div>
+	    </div>
+	</form>
+	</div>
+    </section>
+    
+    <!-- 搜索结果 -->
+    <section class="ym-grid linearize-level-1">
+	<table class="bordertable" style="font-size:0.9em;">
+	    <thead>
+		<tr>
+		    <th width="32%">职位名称</th>
+		    <th width="23%">公司名称</th>
+		    <th width="11%">工作地点</th>
+		    <th width="7%">工作经验</th>
+		    <th width="10%">薪资水平</th>
+		    <th width="9%">发布日期</th>
+		    <th whdth="8%">申请职位</th>
+		</tr>
+	    </thead>
+	    <tbody>
+		{% if page_obj.items %}
+		{% for job in page_obj.items %}
+		<tr>
+		    <td>
+			<a href="{{ url_for('job.view', id=job.id ) }}" target="_blank">{{ job.title }}</a>
+			<!-- <a href="{{ job.zhaopin_url }}">[ 智联招聘的页面 ]</a> -->
+		    </td>
+		    <td><a href="{{ job.company.zhaopin_url }}">{{ job.company.name }}</a></td>
+		    <td>{{ job.work_city }}{% if job.work_area %} - {{ job.work_area }}{% endif %} </td>
+		    <td>{{ job.exp }}</td>
+		    <td>{% if job.salary_low %}{{ job.salary_low }}-{{ job.salary_high }}{% endif %}</td>
+		    <td>{{ job.public_date.strftime('%Y-%m-%d') }}</td>
+		    <td>
+			{% if uid %}
+			<a class="ym-button do-request" style="color:#4D87C7 !important;font-weight:bold;"
+			   href="#" url="{{ url_for('job.addRequest', job_id=job.id) }}">申请</a>
+			{% endif %}
+		    </td>
+		</tr>
+		{% endfor %}
+		{% endif %}
+	    </tbody>
+	</table>
+    </section>
+    <section class="ym-grid linearize-level-1">
+	<div class="ym-gr" style="padding:10px">
+	    {{ pagination(page_obj, page_url) }}
+	</div>
+    </section>
+</div>
+{% endblock %}

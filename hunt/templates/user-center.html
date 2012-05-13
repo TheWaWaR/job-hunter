@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}用户个人中心{% endblock %}
+
+{% block wbox %}
+<div class="ym-wbox">
+    <section class="ym-grid linearize-level-1">
+	<article class="ym-g75 ym-gl content">
+	    <div class="ym-gbox-left ym-clearfix">
+		<h4>用户个人中心</h4>
+		<div class="jquery_tabs" data-sync="true">
+		    {% include "_job-feedback.html" %}
+		    {% include "_job-recommend.html" %}
+		</div>
+	    </div>
+	</article>
+	<aside class="ym-g25 ym-gr ">
+	    <div class="ym-gbox-right ym-clearfix">
+		<div class="box info">
+		    ...
+		</div>
+	    </div>
+	</aside>
+    </section>
+</div>
+{% endblock %}
+
+
+{% block more_js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+	$('.jquery_tabs').accessibleTabs({ syncheight: true, wrapperClass:'' });
+    });
+</script>
+{% endblock %}

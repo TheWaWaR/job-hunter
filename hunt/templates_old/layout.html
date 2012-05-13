@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh" lang="zh">
+    <head>
+	<title>{% block title %}{% endblock %}</title>
+	
+	<!-- Style Sheet -->
+	<link rel="stylesheet" href="/static/css/bootstrap.css" type="text/css"  />
+	<link rel="stylesheet" href="/static/css/bootstrap-responsive.css" type="text/css" />
+	<link rel="stylesheet" href="/static/css/docs.css" type="text/css"  />
+	<link rel="stylesheet" href="/static/css/prettify.css" type="text/css"  />
+	{% block more_css %}
+	{% endblock %}
+	<!-- javascript -->
+	<script type="text/javascript" src="/static/js/jquery.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-dropdown.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-scrollspy.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-collapse.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-tooltip.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-popover.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-carousel.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-alert.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-modal.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-button.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-transition.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-typeahead.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap-tab.js"></script>
+	<script type="text/javascript" src="/static/js/application.js"></script>
+	<script type="text/javascript" src="/static/js/prettify.js"></script>
+    </head>
+    <body>
+	<!-- Navbar
+	     ================================================== -->
+	<div class="navbar navbar-fixed-top">
+	    <div class="navbar-inner">
+		<div class="container">
+		    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		    </a>
+		    <a class="brand" href="#">网上职介所之个人求职</a>
+		    <div class="nav-collapse">
+			<ul class="nav">
+			    <li class="">
+				<a href="{{url_for('frontend.login')}}">登录</a>
+			    </li>
+			    <li class="">
+				<a href="{{url_for('frontend.register')}}">注册</a>
+			    </li>
+			</ul>
+		    </div>
+		</div>
+	    </div>
+	</div>
+	
+	<div class="container">
+	    <!-- Masthead
+		 ================================================== -->
+	    <!-- <header class="jumbotron subhead" id="overview"> -->
+	    <!-- 	<h2>网上职介所之个人求职</h2> -->
+	    <!-- 	<\!-- <p class="lead">提供一个求职的平台</p> -\-> -->
+	    <!-- 	<div class="subnav"> -->
+	    <!-- 	  <ul class="nav nav-pills"> -->
+	    <!-- 	    <li><a href="#forms">Typography</a></li> -->
+	    <!-- 	  </ul> -->
+	    <!-- 	</div> -->
+	    <!-- </header> -->
+	    
+	    {% block sections %}{% endblock %}
+	    
+	    <!-- Footer
+		 ================================================== -->
+	    <footer class="footer">
+		<p class="pull-right"><a href="#">回到顶部</a></p>
+		<p>Author: weet</p>
+	    </footer>
+	</div>
+	{% block more_js %}
+	{% endblock %}
+    </body>
+</html>

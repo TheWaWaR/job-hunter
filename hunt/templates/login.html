@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+
+{% block title %}用户登录{% endblock %}
+{% from "_forms.html" import render_errors %}
+
+{% block wbox %}
+<div class="ym-wbox">
+    <section>
+	<div class="ym-grid linearize-level-1">
+	    
+	    <div class="ym-g50 ym-gl">
+		<div class="ym-gbox-right">&nbsp;</div>
+	    </div>
+	    <div class="ym-g50 ym-gr">
+		<div class="ym-gbox">
+
+		    {% if get_flashed_messages() %}
+		    <div class="box error" style="text-align:center;">
+			{% for msg in get_flashed_messages() %}
+			<span>{{ msg }}</span>
+			{% endfor %}
+		    </div>
+		    {% endif %}
+
+		    <div class="box info">
+			<h5>用户登录</h5>
+			<form method="POST" id="" class="ym-form linearize-form" action="{{url_for('account.login')}}">
+			    {{ form.hidden_tag() }}
+			    <div class="ym-fbox-text">
+				<label for="email">登录邮箱{{ render_errors(form.email) }}</label>
+				{{ form.email }}
+			    </div>
+			    <div class="ym-fbox-text">
+				<label for="password">密码{{ render_errors(form.password) }}</label>
+				{{ form.password }}
+			    </div>
+			    <div class="ym-fbox-button">
+				<input type="submit" value="登录" class="save" id="submit" name="submit">
+				<a href="{{url_for('account.register')}}" class="ym-button ym-gr">注册帐户</a>
+			    </div>
+			</form>
+		    </div>
+		</div>
+		<!-- <div class="ym-gbox ym-clearfix"> -->
+		<!-- </div> -->
+	    </div>
+	</div>
+    </section>
+</div>
+{% endblock %}

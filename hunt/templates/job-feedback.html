@@ -1,0 +1,121 @@
+
+{% extends "layout.html" %}
+
+{% block title %}求职反馈{% endblock %}
+
+{% from "_page.html" import pagination %}
+
+{% block more_js %}
+<script type="text/javascript">
+    $(document).ready(function(){
+	$('.jquery_tabs').accessibleTabs({ syncheight: true, wrapperClass:'' });
+
+	$('.do-request').each(function(index){
+	    var $tar = $(this);
+	    $tar.click(function(e){
+		e.preventDefault();
+		$.getJSON($tar.attr('url'), function(json){
+		    if (json.success) {
+			$tar.text('[已查看]');
+			$tar.css('font-weight', 'normal');
+			$('#hr-evaluate').text(json.hr_evaluate);
+			$('#hr-msg').text(json.hr_msg);
+			$('#feedback-info').slideDown(1000);
+		    } else {
+			alert(json.message);
+		    }
+		});
+	    });
+	});
+    });
+</script>
+{% endblock %}
+
+{% block wbox %}
+<div class="ym-wbox">
+    <section class="ym-grid linearize-level-1">
+	<article class="ym-g75 ym-gl content">
+	    <div class="ym-gbox-left ym-clearfix">
+		<section class="ym-grid linearize-level-2">
+		    <table class="bordertable" style="font-size:0.9em;">
+			<thead>
+			    <tr>
+				<th width="36%">职位名称</th>
+				<th width="28%">公司名称</th>
+				<th width="14%">工作地点</th>
+				<th width="12%">薪资水平</th>
+				<th whdth="10%">反馈</th>
+			    </tr>
+			</thead>
+			<tbody>
+			    {% if page_obj.items %}
+			    {% for jr in page_obj.items %}
+			    {% set job = jr.job %}
+			    <tr>
+				<td>
+				    <a href="{{ url_for('job.view', id=job.id ) }}" target="_blank">{{ job.title }}</a>
+				    <!-- <a href="{{ job.zhaopin_url }}">[ 智联招聘的页面 ]</a> -->
+				</td>
+				<td><a href="{{ job.company.zhaopin_url }}">{{ job.company.name }}</a></td>
+				<td>{{ job.work_city }}{% if job.work_area %} - {{ job.work_area }}{% endif %} </td>
+				<td>{% if job.salary_low %}{{ job.salary_low }}-{{ job.salary_high }}{% endif %}</td>
+				<td class="feedback-col">
+				    {% if jr.feedbacked %}
+				    <a class="ym-button do-request" style="color:#4D87C7 !important;font-weight:bold;"
+				       href="#" url="{{ url_for('job.getFeedbackInfo', req_id=jr.id) }}">
+					{% if jr.checked %}[已查看]{% else %}查看{% endif %}
+				    </a>
+				    {% else %}
+				    等待反馈
+				    {% endif %}
+				</td>
+			    </tr>
+			    {% endfor %}
+			    {% endif %}
+			</tbody>
+		    </table>
+		</section>
+		<section class="ym-grid linearize-level-2">
+		    <div class="ym-gr" style="padding:10px">
+			{{ pagination(page_obj, page_url) }}
+		    </div>
+		</section>
+	    </div>
+	</article>
+	<aside class="ym-g25 ym-gr ">
+	    <div class="ym-gbox-right ym-clearfix">
+		<div class="box info">
+		    <table >
+			<tr>
+			    <th><a href="{{url_for('job.feedback')}}">申请了</a></th>
+			    <td><strong>( {{ cnt_total }} )</strong> 个职位</td>
+			</tr>
+			<tr>
+			    <th><a href="{{url_for('job.feedback', filter='unfeedback')}}">未反馈</a></th>
+			    <td><strong>( {{ cnt_total - cnt_feedbacked }} )</strong> 个职位</td>
+			</tr>
+			<tr>
+			    <th><a href="{{url_for('job.feedback', filter='feedbacked')}}">反馈了</a></th>
+			    <td><strong>( {{ cnt_feedbacked }} )</strong> 个职位</td>
+			</tr>
+			<tr>
+			    <th><a href="{{url_for('job.feedback', filter='checked')}}">查看了</a></th>
+			    <td><strong>( {{ cnt_checked }} )</strong> 个反馈</td>
+			</tr>
+			<tr>
+			    <th><a href="{{url_for('job.feedback', filter='uncheck')}}">未处理</a></th>
+			    <td><strong>( {{ cnt_feedbacked - cnt_checked }} )</strong> 个反馈</td>
+			</tr>
+		    </table>
+		</div>
+		<div id="feedback-info" class="box warning" style="display:none;">
+		    <strong>HR的评价 : </strong><span id="hr-evaluate"> 一般啊</span>
+		    <h6>HR的建议 :</h6>
+		    <span id="hr-msg">你是个好人</span>
+		</div>
+	    </div>
+	</aside>
+    </section>
+</div>
+{% endblock %}
+

@@ -1,0 +1,30 @@
+
+{% macro pagination(page_obj, page_url)  %}
+
+{% if page_obj %}
+<div class="pagination">
+	{% if page_obj.has_prev %}
+	<span class="previous">
+		<a href="{{page_url(page_obj.page-1)}}">[ Previous ]</a>
+	</span>
+	{% endif %}
+	{% for i in page_obj.iter_pages(right_current=2) %}
+		{% if i %}
+			{% if i != page_obj.page %}
+			<a href="{{page_url(i)}}">{{ i }}</a>
+			{% else %}
+			<span>{{ i }}</span>
+			{% endif %}
+		{% else %}
+			<span>...</span>
+		{% endif %}
+	{% endfor %}
+	{% if page_obj.has_next %}
+	<span class="next">
+		<a href="{{page_url(page_obj.page+1)}}">[ Next ]</a>
+	</span>
+	{% endif %}
+</div>
+{% endif %}
+
+{% endmacro %}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh" lang="zh">
+    <head>
+	<title>{% block title %}Home{% endblock %}</title>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+	<!-- Style Sheet -->
+	<link rel="stylesheet" href="/static/yaml/core/base.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/core/iehacks.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/screen/grid-960-12.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/screen/typography.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/screen/screen-FULLPAGE-layout.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/navigation/hlist.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/forms/gray-theme.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/print/print.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/add-ons/microformats/microformats.css" type="text/css" />
+	<link rel="stylesheet" href="/static/yaml/add-ons/accessible-tabs/tabs.css" type="text/css" />
+	<!-- <link href="http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700|Droid+Sans:700" -->
+	<!--       rel="stylesheet" type="text/css"> -->
+	<!-- <link rel="stylesheet" href="/static/yaml/add-ons/rtl-support/navigation/hlist-rtl.css" type="text/css" /> -->
+	<!-- <link rel="stylesheet" href="/static/yaml/add-ons/rtl-support/core/base-rtl.css" type="text/css" /> -->
+	<!-- <link rel="stylesheet" href="/static/yaml/add-ons/rtl-support/screen/typography-rtl.css" type="text/css" /> -->
+	
+	{% block more_css %}
+	{% endblock %}
+	
+	<!-- javascript -->
+	<script type="text/javascript" src="/static/yaml/core/js/yaml-focusfix.js"></script>
+	
+	<script type="text/javascript" src="/static/js/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.snippet.js"></script>
+	<script type="text/javascript" src="/static/js/jquery.gridbuilder.js"></script>
+	<script type="text/javascript" src="/static/yaml/add-ons/accessible-tabs/jquery.tabs.js"></script>
+	<script type="text/javascript" src="/static/yaml/add-ons/syncheight/jquery.syncheight.js"></script>
+	<script type="text/javascript" src="/static/js/domscript.js"></script>
+	{% block more_js %}
+	{% endblock %}
+    </head>
+    <body>
+	<ul class="ym-skiplinks">
+	    <li><a class="ym-skip" href="#nav">Skip to navigation (Press Enter)</a></li>
+	    <li><a class="ym-skip" href="#main">Skip to main content (Press Enter)</a></li>
+	</ul>
+	
+	<header style="background: #161E21;text-shadow:1px 1px 1px rgba(0, 0, 0, .8);">
+	    <div class="ym-wrapper">
+		<div class="ym-wbox">
+		    <h2 style="color: #8B8F90;font-family:Microsoft Yahei;">个人求职</h2>
+		</div>
+	    </div>
+	</header>
+	<nav id="nav" style="border-top: 1px black solid; background: #080B0C;">
+	    <div class="ym-wrapper">
+		<div class="ym-hlist" style="border-top: 1px black solid; background: #080B0C;">
+		    <ul class="ym-gl">
+			{% set uid = session.get('uid') if session.get('uid') else False %}
+			{% set current_url = request.environ.PATH_INFO %}
+			<li {% if current_url==url_for('frontend.index') %} class="active" {% endif %}>
+			    <a href="{{url_for('frontend.index')}}" >首页</a></li>
+			
+			<li {% if current_url==url_for('job.search') %} class="active" {% endif %}>
+			    <a href="{{url_for('job.search')}}">职位搜索</a></li>
+			
+			{% if current_url==url_for('job.view', id=1) %}
+			<li class="active" > <a href="{{url_for('job.view', id=1)}}">职位详情</a></li>
+			{% endif %}
+			
+			{% if uid %}
+			<li {% if current_url==url_for('job.feedback') %} class="active" {% endif %}>
+			    <a href="{{url_for('job.feedback')}}">求职反馈</a></li>
+			
+			<!-- <li {% if current_url==url_for('job.recommend') %} class="active" {% endif %}> -->
+			<!--     <a href="{{url_for('job.recommend')}}">职位推荐</a></li> -->
+			{% endif %}
+		    </ul>
+		    <!-- <form class="ym-searchform"> -->
+		    <!-- 	<input class="ym-searchfield" type="search" placeholder="Search..." /> -->
+		    <!-- 	<input class="ym-searchbutton" type="submit" value="Search" /> -->
+		    <!-- </form> -->
+		    <div class="ym-gr">
+			<ul>
+			    {% if uid %}
+			    <li {% if current_url==url_for('account.user_profile_edit') %} class="active" {% endif %}>
+				<a href="{{url_for('account.user_profile_edit')}}">完善用户资料</a></li>
+
+			    <li {% if current_url==url_for('account.logout') %} class="active" {% endif %}>
+				<a href="{{url_for('account.logout')}}">退出</a></li>
+			    {% else %}
+
+			    <li {% if current_url==url_for('account.login') %} class="active" {% endif %}>
+				<a href="{{url_for('account.login')}}">登录</a></li>
+			    
+			    <li {% if current_url==url_for('account.register') %} class="active" {% endif %}>
+				<a href="{{url_for('account.register')}}">注册</a></li>
+			    {% endif %}
+			</ul>
+		    </div>
+		</div>
+	    </div>
+	</nav>
+	<div id="main" style="min-height:459px;">
+	    <div class="ym-wrapper">
+		{% block wbox %}
+		<div class="ym-wbox">
+		    <!-- 搜索框 -->
+		    <section class="ym-grid linearize-level-1">
+			<div class="box info">
+			    <h4>职位搜索</h4>
+			    <form method="get" action="{{url_for('job.search')}}"
+				  id="demo-form2" class="ym-form linearize-form ym-full" role="application">
+				<div class="ym-grid linearize-level-1">
+				    <div class="ym-g80 ym-gl">
+					<div class="ym-grid linearize-level-2">
+					    <div class="ym-g33 ym-gl">
+						<div class="ym-gbox ym-fbox-select">
+						    <label for="exp">工作经验</label>
+						    <select name="exp" id="exp" size="1" style="width:auto;">
+							<!-- <option value="0" selected="selected" disabled="disabled">请选择</option> -->
+							<option value="不限">不限</option>
+							<option value="无经验">无经验</option>
+							<option value="1年以下">1年以下</option>
+							<option value="1-2年">1-2年</option>
+							<option value="1-3年">1-3年</option>
+							<option value="1-5年">1-5年</option>
+							<option value="1-6年">1-6年</option>
+							<option value="1-8年">1-8年</option>
+							<option value="1-10年">1-10年</option>
+							<option value="3-5年">3-5年</option>
+							<option value="2-3年">2-3年</option>
+							<option value="2-4年">2-4年</option>
+							<option value="2-5年">2-5年</option>
+							<option value="2-7年">2-7年</option>
+							<option value="2-10年">2-10年</option>
+							<option value="3-10年">3-10年</option>
+							<option value="5-10年">5-10年</option>
+							<option value="1年以上">1年以上</option>
+							<option value="2年以上">2年以上</option>
+							<option value="3年以上">3年以上</option>
+							<option value="4年以上">4年以上</option>
+							<option value="5年以上">5年以上</option>
+							<option value="7年以上">7年以上</option>
+							<option value="8年以上">8年以上</option>
+							<option value="10年以上">10年以上</option>
+						    </select>
+						</div>
+						<div class="ym-gbox ym-fbox-select">
+						    <label for="salary">薪资水平</label>
+						    <select name="salary" id="salary" style="width:auto;">
+							<option value="0">不限</option>
+							<option value="1000">1000+</option>
+							<option value="1500">1500+</option>
+							<option value="2000">2000+</option>
+							<option value="3000">3000+</option>
+							<option value="4000">4000+</option>
+							<option value="5000">5000+</option>
+							<option value="6000">6000+</option>
+							<option value="8000">8000+</option>
+							<option value="10000">10000+</option>
+							<option value="15000">15000+</option>
+						    </select>
+						</div>
+					    </div>
+					    <div class="ym-g33 ym-gl">
+						<div class="ym-gbox ym-fbox-select">
+						    <label for="public-date">发布日期</label>
+						    <select name="public_date" id="public-date" style="width:auto;" >
+							<option value="all" selected="selected">所有日期</option>
+							<option value="month">最近一个月</option>
+							<option value="week">最近一周</option>
+							<option value="3days">最近3天</option>
+							<option value="today">今天</option>
+						    </select>
+						    <!-- <label style="width:10px;float:left;">&nbsp;</label> -->
+						</div>
+						<div class="ym-gbox ym-fbox-text">
+						    <label for="key-word">关键词</label>
+						    <input type="text" name="key_words" value="{{ key_words }}"
+							   id="key-word" size="20" placeholder="与招聘内容相关">
+						</div>
+					    </div>
+					    <div class="ym-g33 ym-gl">
+						<div class="ym-gbox ym-fbox-text">
+						    <label for="company-name">公司名称</label>
+						    <input type="text" name="company_name" value="{{ company_name }}" id="company-name" size="20">
+						</div>
+						<div class="ym-gbox ym-fbox-text">
+						    <label for="work-place">工作地点</label>
+						    <input type="text" name="work_place" value="{{ work_place }}"
+							   id="work-place" size="20" placeholder="例如(浙江 杭州)">
+						</div>
+					    </div>
+					</div>
+				    </div>
+				    
+				    <div class="ym-g20 ym-gr">
+					<div class="ym-fbox-button">
+					    <input type="submit" value="搜索" class="submit" id="submit1">
+					    <input type="reset" value="重置" class="reset" id="reset1" name="reset1">
+					</div>
+				    </div>
+				</div>
+			    </form>
+			</div>
+		    </section>
+		    
+		    <section class="box">
+			<div class="">
+			    <a href="http://www.google.com/">
+			    </a>
+			</div>
+		    </section>
+		</div>
+		{% endblock %}
+	    </div>
+	</div>
+	<footer style="background: #161E21;text-shadow:1px 1px 1px rgba(0, 0, 0, .8);border-top: 2px black solid;">
+	    <div class="ym-wrapper">
+		<div class="ym-wbox">
+		    <p>© weet-DT 2012 &ndash; Layout based on <a href="http://www.yaml.de">YAML</a></p>
+		</div>
+	    </div>
+	</footer>
+	
+    </body>
+</html>

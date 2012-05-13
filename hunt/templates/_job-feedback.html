@@ -1,0 +1,68 @@
+    <section class="ym-grid linearize-level-1">
+	<table class="bordertable" style="font-size:0.9em;">
+	    <thead>
+		<tr>
+		    <th width="32%">职位名称</th>
+		    <th width="23%">公司名称</th>
+		    <th width="11%">工作地点</th>
+		    <th width="7%">工作经验</th>
+		    <th width="10%">薪资水平</th>
+		    <th width="9%">发布日期</th>
+		    <th whdth="8%">申请职位</th>
+		</tr>
+	    </thead>
+	    <tbody>
+		{% if page_obj.items %}
+		{% for job in page_obj.items %}
+		<tr>
+		    <td>
+			<a href="{{ url_for('job.view', id=job.id ) }}" target="_blank">{{ job.title }}</a>
+			<!-- <a href="{{ job.zhaopin_url }}">[ 智联招聘的页面 ]</a> -->
+		    </td>
+		    <td><a href="{{ job.company.zhaopin_url }}">{{ job.company.name }}</a></td>
+		    <td>{{ job.work_city }}{% if job.work_area %} - {{ job.work_area }}{% endif %} </td>
+		    <td>{{ job.exp }}</td>
+		    <td>{% if job.salary_low %}{{ job.salary_low }}-{{ job.salary_high }}{% endif %}</td>
+		    <td>{{ job.public_date.strftime('%Y-%m-%d') }}</td>
+		    <td><a class="ym-button do-request" style="color:#4D87C7 !important;font-weight:bold;"
+			   href="#" url="{{ url_for('job.addRequest', job_id=job.id) }}">申请</a></td>
+		</tr>
+		{% endfor %}
+		{% endif %}
+	    </tbody>
+	</table>
+    </section>
+    <section class="ym-grid linearize-level-1">
+	<div class="ym-gr" style="padding:10px">
+	    {{ pagination(page_obj, page_url) }}
+	</div>
+    </section>
+<div class="tab-content">
+    <table class="bordertable">
+	<thead>
+	    <tr>
+		<th>职位名称</th>
+		<th>公司名称</th>
+		<th>工作地点</th>
+		<th>发布日期</th>
+		<th></th>
+	    </tr>
+	</thead>
+	<tbody>
+	    <tr>
+		<td>..</td>
+		<td>..</td>
+		<td>...</td>
+		<td>...</td>
+		<td>...</td>
+	    </tr>
+	    <tr>
+		<td>..</td>
+		<td>..</td>
+		<td>...</td>
+		<td>...</td>
+		<td>...</td>
+	    </tr>
+	</tbody>
+    </table>
+</div>
