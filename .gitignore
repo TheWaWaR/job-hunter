@@ -6,7 +6,7 @@
 *.swp
 /HTML-pages
 /hunt/static_old
-/hunt/template_old
+/hunt/templates_old
 
 # Packages
 *.egg
